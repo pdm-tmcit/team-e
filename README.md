@@ -5,5 +5,6 @@
  * re
  * spacy(ginza)
  ### 使い方
- * python3 data.py 【ファイル名】
+ * python3 data.py
+ 【ファイル名】
  
