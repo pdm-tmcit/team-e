@@ -92,7 +92,7 @@ class WareWolfGame:
                 continue
             for sentence in sentences:
                 if self.config["test_mode"]:
-                    print("\n" + sentence)
+                    print(f"\n{log_index} {player_name} {sentence}")
                 results = self._nlp.parse({
                     "player_name": player_name,
                     "true_role_name": true_role_name,
