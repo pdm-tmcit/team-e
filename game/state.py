@@ -1,5 +1,6 @@
 # coding:utf-8
 import re
+import copy
 from pprint import pprint
 from termcolor import colored
 from .nlp import NLP
@@ -21,7 +22,7 @@ class WareWolfGame:
         }
         self._nlp = NLP()
         self._log_data = log_data
-        self.generate_log_data = log_data
+        self.generate_log_data = copy.deepcopy(log_data)
         self.players_count = 0
         self.loaded_log_count = 0
         self.last_day = 0
