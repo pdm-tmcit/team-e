@@ -1,60 +1,70 @@
 import random
+import sentences
+
+
 class TemplateResponder():
-	def __init__(self):
-		return
+    SIRO = 0
+    KURO = 1
 
-	#zenbu random
-	def response(self,mode,target_name=None,role_name=None):
-		self.mode=mode
-		self.target_name=target_name
-		self.role_name=role_name
+    def __init__(self):
+        return
 
-		if self.mode=="co":
-			return self.co()
-		elif self.mode=="seer":
-			return self.seer()
-		elif self.mode=="medium":
-			return self.medium()
-		return self.random()
+    # zenbu random
+    def response(self, mode, target_name=None, team_name=None):
+        self.mode = mode
+        self.target_name = target_name
+        self.team_name = team_name
 
+        if self.mode == "co":
+            return self.co()
+        elif self.mode == "seer":
+            return self.seer()
+        elif self.mode == "medium":
+            return self.medium()
 
-	def co(self):
-		r=open("co.txt").read().split("\n")
-		t=random.randint(0,len(r)-2)
-		sentence=r[t]
-		return sentence
+        return self.random()
 
+    def __replace_target(self, sentence):
+        return sentence.replace("%target%", self.target_name)
 
-	def seer(self):
-		r=open("seer.txt").read().split("\n")
-		t=random.randint(0,len(r)-2)
-		sentence=r[t]
-		if sentence.find("%target%")== -1:
-			return sentence
-		if self.target_name is not None:
-			sentence=sentence.replace("%target%",self.target_name)
-		return sentence
+    def __unknown(self, r):
+        return r["unknown"][random.randint(0, len(r["unknown"])-1)]
 
+    def __get_by_random(self, r):
+        return r[random.randint(0, len(r)-1)]
 
-	def medium(self):
-		r=open("medium.txt").read().split("\n")
-		t=random.randint(0,len(r)-2)
-		sentence=r[t]
-		if sentence.find("%target%")== -1:
-			return sentence
-		if self.target_name is not None:
-			sentence=sentence.replace("%target%",self.target_name)
-		return sentence
+    def co(self):
+        r = sentences.co.copy()
+        return self.__get_by_random(r)
 
+    def seer(self):
+        r = sentences.seer.copy()
 
-	def random(self):
-		r=open("random.txt").read().split("\n")
-		t=random.randint(0,len(r)-2)
-		sentence=r[t]
-		return sentence
+        if self.target_name is None:
+            return self.__unknown(r)
 
-		
-a=TemplateResponder()
-		
-		
+        if self.team_name == TemplateResponder.SIRO:
+            return self.__replace_target(self.__get_by_random(r['siro']))
+
+        elif self.team_name == TemplateResponder.KURO:
+            return self.repalce_target(self.__get_by_random(r['kuro']))
+        else:
+            return self.__unknown(r)
+
+    def medium(self):
+        r = sentences.medium.copy()
+
+        if self.target_name is None:
+            return self.__unknown(r)
+
+        if self.team_name == TemplateResponder.SIRO:
+            return self.__replace_target(self.__get_by_random(r['siro']))
+        elif self.team_name == TemplateResponder.KURO:
+            return self.__replace_target(self.__get_by_random(r['kuro']))
+        else:
+            return self.__unknown(r)
+
+    def random(self):
+        r = sentences.random.copy()
+        return self.__get_by_random(r)
 
