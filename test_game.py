@@ -15,7 +15,7 @@ if __name__ == "__main__":
         with open(argv[1]) as f:
             reader = csv.reader(f)
             log_data = [row_data for row_data in reader]
-    except Exception as e:
+    except Exception:
         print(colored("ファイルが存在しません。", "red"))
         exit()
 

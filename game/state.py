@@ -44,7 +44,9 @@ class WareWolfGame:
                 break
             talks_text = "".join(talks_list)
             # プロローグ中に抜けた人がいるか
-            if player_name == "楽天家ゲルト" and (target_name := re.findall("急用により(.+?)は旅立ったよ", talks_text)) and (player_name := get_full_player_name(target_name, self.joined_players_list)):
+            if (player_name == "楽天家ゲルト"
+                    and (target_name := re.findall("急用により(.+?)は旅立ったよ", talks_text))
+                    and (player_name := self._nlp.get_full_player_name(target_name, self.joined_players_list))):
                 self.players_co_dict.pop(player_name)
             # RPっぽいか
             if re.search("=|＝|rp", talks_text.lower()):
@@ -83,12 +85,12 @@ class WareWolfGame:
             log_index = index + self.loaded_log_count + 1
             talks_text = "".join(talks_list)
             if not talks_text:
-                generated_sentence = self.generate_response(log_index, sentence)
+                generated_sentence = self.generate_response(log_index, self._log_data[log_index - 2][3])
                 self.generate_log_data[log_index - 1][3] = generated_sentence
                 print(colored(f"BLANK：\t空欄\t{log_index} {player_name} {true_role_name} {generated_sentence}", "blue"))
                 continue
             # 【】で括られた文章の抜き取り
-            if not (sentences := re.findall("【((?!>>\d|\d{2}:\d{2}).+?)】", talks_text)):
+            if not (sentences := re.findall(r"【((?!>>\d|\d{2}:\d{2}).+?)】", talks_text)):
                 continue
             for sentence in sentences:
                 if self.config["test_mode"]:
@@ -99,6 +101,7 @@ class WareWolfGame:
                     "co_role_name": self.players_co_dict[player_name].get("co_role_name")
                 }, sentence)
                 for r in results:
+                    comp_text = '≠' if r.get("is_negative") else '='
                     if r["mode"] == "co":
                         self.nlp_results_list[-1]["co"][player_name] = log_index
                         if r["is_negative"]:
@@ -106,7 +109,7 @@ class WareWolfGame:
                         else:
                             self.players_co_dict[r["target_name"]]["co_role_name"] = r["role_name"]
                         color = "green" if r["is_true_sentence"] else "red"
-                        colored_text = colored(f"{r['use_engine']}：\tCO\t{log_index} {r['target_name']} {'≠' if r['is_negative'] else '='} {r['role_name']}", color)
+                        colored_text = colored(f"{r['use_engine']}：\tCO\t{log_index} {r['target_name']} {comp_text} {r['role_name']}", color)
                         print(colored_text)
                     elif r["mode"] == "co_check":
                         self.player_checked_list[-1]["co"][player_name] = log_index
@@ -128,7 +131,8 @@ class WareWolfGame:
                             "role_name": r["role_name"]
                         }
                         color = "green" if r["is_true_sentence"] else "red"
-                        colored_text = colored(f"{r['use_engine']}：\t{'占い師' if r['mode'] == 'seer' else '霊能者'}\t{log_index} {r['target_name']} {'≠' if r['is_negative'] else '='} {r['role_name']}", color)
+                        mode = '占い師' if r['mode'] == 'seer' else '霊能者'
+                        colored_text = colored(f"{r['use_engine']}：\t{mode}\t{log_index} {r['target_name']} {comp_text} {r['role_name']}", color)
                         print(colored_text)
         else:
             self.end_flag = True

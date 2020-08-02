@@ -56,8 +56,8 @@ class NLP:
         return re.search("ない|なかった|せん", sentence)
 
     # 省略された名前からフルネームの取得
-    def get_full_player_name(self, text):
-        for player_names in self._joined_players_list:
+    def get_full_player_name(self, text, joined_players_list=None):
+        for player_names in (joined_players_list or self._joined_players_list):
             if text in player_names:
                 return player_names[0]
         return None
@@ -136,7 +136,10 @@ class NLP:
             nouns = self.get_nouns(sentence)
             is_negative = self.get_is_negative(sentence)
             # 取得した名詞のどちらかがが名詞リストに一致するか
-            if len(nouns["else"]) > 2 or not nouns["else"] or not ((root_target := list(nouns["else"])[0]) in self._nouns_list or nouns["root"] in self._nouns_list):
+            if (len(nouns["else"]) > 2
+                    or not nouns["else"]
+                    or not ((root_target := list(nouns["else"])[0]) in self._nouns_list
+                    or nouns["root"] in self._nouns_list)):
                 return results
             target_name = self.get_full_player_name(root_target)
             # ROOTに役職名が含まれない場合
