@@ -12,6 +12,7 @@ class WareWolfGame:
 
     def __init__(self, log_data, config={}):
         self.config = {
+            "logging": True,
             "test_mode": False,
             "use_template_row_count": 10
         }
@@ -32,12 +33,15 @@ class WareWolfGame:
         self.nlp_results_list = []
         self.player_checked_list = []
 
-    def show_state(self):
+    def print_state(self):
         pprint(self.players_co_dict)
         print()
         pprint(self.nlp_results_list)
         print()
         pprint(self.player_checked_list)
+
+    def print_log(self, text):
+        self.config["logging"] and print(text)
 
     def load_prologue(self):
         for index, [now_day_text, player_name, true_role_name, *talks_list] in enumerate(self._log_data):
@@ -88,7 +92,7 @@ class WareWolfGame:
             if not talks_text:
                 generated_sentence = self.generate_response(log_index, self._log_data[log_index - 2][3])
                 self.generate_log_data[log_index - 1][3] = generated_sentence
-                print(colored(f"BLANK：\t空欄\t{log_index} {player_name} {true_role_name} {generated_sentence}", "blue"))
+                self.print_log(colored(f"BLANK：\t空欄\t{log_index} {player_name} {true_role_name} {generated_sentence}", "blue"))
                 continue
             # 【】で括られた文章の抜き取り
             if not (sentences := re.findall(r"【((?!>>\d|\d{2}:\d{2}).+?)】", talks_text)):
@@ -111,17 +115,17 @@ class WareWolfGame:
                             self.players_co_dict[r["target_name"]]["co_role_name"] = r["role_name"]
                         color = "green" if r["is_true_sentence"] else "red"
                         colored_text = colored(f"{r['use_engine']}：\tCO\t{log_index} {r['target_name']} {comp_text} {r['role_name']}", color)
-                        print(colored_text)
+                        self.print_log(colored_text)
                     elif r["mode"] == "co_check":
                         self.player_checked_list[-1]["co"][player_name] = log_index
                         colored_text = colored(f"{r['use_engine']}：\tCO確\t{log_index} {player_name}", "yellow")
-                        print(colored_text)
+                        self.print_log(colored_text)
                     elif r["mode"] == "else_check":
                         if self.last_day == 1:
                             continue
                         self.player_checked_list[-1]["else"][player_name] = log_index
                         colored_text = colored(f"{r['use_engine']}：\t占霊確\t{log_index} {player_name}", "yellow")
-                        print(colored_text)
+                        self.print_log(colored_text)
                     else:
                         if self.last_day == 1:
                             continue
@@ -134,7 +138,7 @@ class WareWolfGame:
                         color = "green" if r["is_true_sentence"] else "red"
                         mode = '占い師' if r['mode'] == 'seer' else '霊能者'
                         colored_text = colored(f"{r['use_engine']}：\t{mode}\t{log_index} {r['target_name']} {comp_text} {r['role_name']}", color)
-                        print(colored_text)
+                        self.print_log(colored_text)
         else:
             self.end_flag = True
         self.loaded_log_count += index
