@@ -13,9 +13,10 @@ class NLP:
         self.roles_list = dictionary.roles_list
         self.all_players_dict = dictionary.all_players_dict
         self._role_names_list = [role_name for role_names in self.roles_list for role_name in role_names]  # [役職名1, 略称1, 役職名2, 略称2, ...]
+        self._role_names_pattern = "|".join(self._role_names_list)  # 役職名の正規表現用パターン
         self._joined_players_list = []  # [[名前1, 略称1], [名前2, 略称2], ...]
         self._nouns_list = []  # [*一人称, *役職名, *名前]
-        self._nouns_pattern = "|".join(self._nouns_list)  # 正規表現用パターン
+        self._nouns_pattern = "|".join(self._nouns_list)  # 主語の正規表現用パターン
 
     # 参加中のプレイヤー登録
     def set_joined_players(self, joined_players_list):
@@ -81,7 +82,7 @@ class NLP:
         results = []
         # 確認等に使えるか1（これのみ名詞リストの名詞を含まなくていいものとする）
         if re.search("確認", lower_sentence := sentence.lower()) and not re.search("仮|決定|時刻|時間", lower_sentence):
-            if re.search("co|ｃｏ", lower_sentence):
+            if re.search("co|ｃｏ|" + self._role_names_pattern, lower_sentence):
                 results.append({
                     "use_engine": "RE",
                     "mode": "co_check"
