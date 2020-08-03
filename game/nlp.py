@@ -81,7 +81,7 @@ class NLP:
         results = []
         # 確認等に使えるか1（これのみ名詞リストの名詞を含まなくていいものとする）
         if re.search("確認", sentence.lower()):
-            if "co" in sentence.lower():
+            if re.search("co|ｃｏ", sentence.lower()):
                 results.append({
                     "use_engine": "RE",
                     "mode": "co_check"
@@ -101,7 +101,7 @@ class NLP:
         elif re.search("了解|ok|ｏｋ|→", sentence.lower()):
             """結果の確認に使えるがとりあえず保留（1より使いにくいので使わない）"""
         # 正規表現で解析するか（COのみ）
-        elif (is_negative := "非" in sentence) or "co" in sentence.lower() or "対抗" in sentence:
+        elif (is_negative := "非" in sentence) or re.search("co|ｃｏ", sentence.lower()) or "対抗" in sentence:
             format_sentence = re.sub("[^一-龥]", "", sentence)  # 漢字以外を削除
             for role_names in self.roles_list:
                 # 一文字ずつ役職名と一致するか確認
