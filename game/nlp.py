@@ -80,8 +80,8 @@ class NLP:
     def parse(self, talker_dict, sentence):
         results = []
         # 確認等に使えるか1（これのみ名詞リストの名詞を含まなくていいものとする）
-        if re.search("確認", sentence.lower()):
-            if re.search("co|ｃｏ", sentence.lower()):
+        if re.search("確認", lower_sentence := sentence.lower()) and not re.search("仮|決定|時刻|時間", lower_sentence):
+            if re.search("co|ｃｏ", lower_sentence):
                 results.append({
                     "use_engine": "RE",
                     "mode": "co_check"
@@ -98,10 +98,10 @@ class NLP:
         elif re.search("●|○|▼|▽", sentence):
             """とりあえず保留"""
         # 確認等に使えるか2
-        elif re.search("了解|ok|ｏｋ|→", sentence.lower()):
+        elif re.search("了解|ok|ｏｋ|→", lower_sentence):
             """結果の確認に使えるがとりあえず保留（1より使いにくいので使わない）"""
         # 正規表現で解析するか（COのみ）
-        elif (is_negative := "非" in sentence) or re.search("co|ｃｏ", sentence.lower()) or "対抗" in sentence:
+        elif (is_negative := "非" in sentence) or re.search("co|ｃｏ", lower_sentence) or "対抗" in sentence:
             format_sentence = re.sub("[^一-龥]", "", sentence)  # 漢字以外を削除
             for role_names in self.roles_list:
                 # 一文字ずつ役職名と一致するか確認
@@ -138,7 +138,7 @@ class NLP:
             # 取得した名詞のどちらかがが名詞リストに一致するか
             if (len(nouns["else"]) > 2
                     or not nouns["else"]
-                    or not ((root_target := list(nouns["else"])[0]) in self._nouns_list
+                    or not ((root_target := re.sub("君$", "", list(nouns["else"])[0])) in self._nouns_list
                     or nouns["root"] in self._nouns_list)):
                 return results
             target_name = self.get_full_player_name(root_target)
