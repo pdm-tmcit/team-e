@@ -54,7 +54,7 @@ class NLP:
     # 否定が含まれるか
     def get_is_negative(self, sentence):
         # GiNZA使えれば使うけどわからん
-        return re.search("ない|なかった|せん", sentence)
+        return re.search("無い|ない|無かった|なかった|せん", sentence)
 
     # 省略された名前からフルネームの取得
     def get_full_player_name(self, text, joined_players_list=None):
