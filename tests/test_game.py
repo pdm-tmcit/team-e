@@ -1,15 +1,14 @@
 # coding:utf-8
-import sys
 import csv
 from termcolor import colored
 from game.state import WareWolfGame
-from unittest import TestCase, main
+from unittest import TestCase
 
 
 class TestGame(TestCase):
 
     def test_game(self):
-        file_path = "./log/test.csv"
+        file_path = "./log/village_g10.csv"
         # ログファイル読み込み
         try:
             with open(file_path) as f:
@@ -32,21 +31,4 @@ class TestGame(TestCase):
             last_day += 1
             print("\n\n")
 
-        result_path = f"./results/{file_path.split('/')[-1]}"
-        with open(result_path, "w") as f:
-            writer = csv.writer(f)
-            writer.writerows(warewolf_game.generate_log_data)
-
-        try:
-            with open(result_path) as f:
-                reader = csv.reader(f)
-                generate_log_data = [row_data for row_data in reader]
-        except Exception:
-            print(colored("ファイルが存在しません。", "red"))
-            exit()
-        for row_data in generate_log_data:
-            self.assertTrue(row_data[3])
-
-
-if __name__ == "__main__":
-    main()
+        warewolf_game.print_state()
