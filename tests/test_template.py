@@ -1,5 +1,5 @@
 # coding:utf-8
-from unittest import TestCase, main
+from unittest import TestCase
 from template.template import TemplateResponder
 
 
@@ -22,7 +22,3 @@ class TestTemplate(TestCase):
                 response = responder.response(mode, target_name, team_name)
                 print(f"出力：{response}\n")
                 self.assertIsNotNone(response)
-
-
-if __name__ == "__main__":
-    main()
