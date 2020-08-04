@@ -1,6 +1,7 @@
 # coding:utf-8
-from unittest import TestCase, main
+from unittest import TestCase
 from chatbot.chatbot import Chatbot
+
 
 class TestChatbot(TestCase):
 
@@ -19,7 +20,3 @@ class TestChatbot(TestCase):
                 response = responder.response(sentence)
                 print(f"出力：{response}\n")
                 self.assertTrue(response)
-
-
-if __name__ == "__main__":
-    main()
