@@ -8,7 +8,7 @@ from unittest import TestCase
 class TestGame(TestCase):
 
     def test_game(self):
-        file_path = "./log/village_g10.csv"
+        file_path = "./log/test.csv"
         # ログファイル読み込み
         try:
             with open(file_path) as f:

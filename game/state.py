@@ -4,8 +4,6 @@ import copy
 from pprint import pprint
 from termcolor import colored
 from .nlp import NLP
-from template.template import TemplateResponder
-from chatbot.chatbot import Chatbot
 
 
 class WareWolfGame:
@@ -17,6 +15,12 @@ class WareWolfGame:
             "use_template_row_count": 10
         }
         self.config.update(config)
+        if self.config["test_mode"]:
+            from .test_template.template import TemplateResponder
+            from .test_chatbot.chatbot import Chatbot
+        else:
+            from template.template import TemplateResponder
+            from chatbot.chatbot import Chatbot
         self.responder = {
             "template": TemplateResponder(),
             "chatbot": Chatbot()
