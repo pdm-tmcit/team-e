@@ -16,3 +16,8 @@
 | ブランチ管理の方針           | GitHub Flow              |
 
 [全部入りVM](https://drive.google.com/file/d/1B-y4uK_MsaQQOxx7CY5OWhn8d81WZ4Mu/view?usp=sharing)
+
+## クラス使用
+* response(text):textに文字列を入力
+* study():testdataディレクトリ内にテキストデータを入れたうえで実行
+
