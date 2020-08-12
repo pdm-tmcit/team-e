@@ -51,6 +51,8 @@ $ python -m unittest test_integration.py
 結合テストが通った場合、出力ファイルの中身を目視で確認する。（総合テスト）
 
 ## chatbotクラス仕様
+* response:入力された文字列に対して返答を返す
+* study:textdataフォルダに入っているテキストファイルからパターンを学習
 
 ## HackMD
 
