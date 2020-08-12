@@ -2,6 +2,7 @@ import re
 from random import choice
 
 class PatternResponder:
+        # 辞書ファイルの読み込み
         def __init__(self):
             self._pattern = []
             with open('chatbot/dics/pattern.txt', 'r') as f:
@@ -15,6 +16,7 @@ class PatternResponder:
             with open('chatbot/dics/random.txt', 'r') as f:
                 self._random = [s.strip() for s in f.readlines()]
 
+        # パターンに合うものがあればパターンの辞書からなければランダムな文章を返す
         def response(self, text):
             for ptn in self._pattern:
                 matcher = re.match(ptn['pattern'], text)
