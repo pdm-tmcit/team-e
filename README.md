@@ -50,6 +50,8 @@ $ python -m unittest test_integration.py
 出力ファイルの会話に一つでも空文字があったらエラーとなる。（結合テスト）
 結合テストが通った場合、出力ファイルの中身を目視で確認する。（総合テスト）
 
+## chatbotクラス仕様
+
 ## HackMD
 
 [要件定義案1](https://hackmd.io/rXndBdSgRNSAV0mRnjowHw)
