@@ -1,6 +1,7 @@
 # coding:utf-8
 import re
 import copy
+import random
 from pprint import pprint
 from termcolor import colored
 from .nlp import NLP
@@ -70,6 +71,23 @@ class WareWolfGame:
         self.players_count = len(self.players_co_dict)
         self._nlp.set_joined_players(self.joined_players_list)
         return self.players_count > 0
+
+    def vote(self):
+        if random.choice([0, 1]):   # COから選択
+            index_array = [
+                index
+                for index, user in enumerate(self.players_co_dict.values())
+                if user.get("co_role_name") == "人狼"
+            ]
+            try:
+                return list(self.players_co_dict.keys())[random.choice(index_array)]
+            except Exception:
+                return None
+        # 占い結果から選択
+        vote_user = set(result.get("target_name") for result in self.nlp_results_list[-1]["seer"].values() if result.get("team_name") == "黒")
+        if len(vote_user):
+            return vote_user.pop()
+        return None
 
     def next_day(self):
         if self.loaded_log_count == 0:
