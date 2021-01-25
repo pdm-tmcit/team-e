@@ -82,12 +82,12 @@ class WareWolfGame:
             try:
                 return list(self.players_co_dict.keys())[random.choice(index_array)]
             except Exception:
-                return None
+                return random.choice(self.joined_players_list[1:])[0]
         # 占い結果から選択
         vote_user = set(result.get("target_name") for result in self.nlp_results_list[-1]["seer"].values() if result.get("team_name") == "黒")
         if len(vote_user):
             return vote_user.pop()
-        return None
+        return random.choice(self.joined_players_list[1:])[0]
 
     def next_day(self):
         if self.loaded_log_count == 0:
