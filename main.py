@@ -24,7 +24,7 @@ if __name__ == "__main__":
     filename = argv[1].split('/')[-1][0:-4]
     time = strftime("%Y%m%d%H%M%S", gmtime())
     os.mkdir(f"results/{filename}_{time}")
-    warewolf_game = WareWolfGame(log_data)
+    warewolf_game = WareWolfGame(f"{filename}_{time}", log_data)
     if not warewolf_game.load_prologue():
         print(colored("プロローグからプレイヤーを取得できませんでした。", "red"))
         exit()
