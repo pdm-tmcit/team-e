@@ -1,5 +1,7 @@
 # coding:utf-8
 import sys
+import os
+from time import gmtime, strftime
 import csv
 from termcolor import colored
 from game.state import WareWolfGame
@@ -19,6 +21,9 @@ if __name__ == "__main__":
         print(colored("ファイルが存在しません。", "red"))
         exit()
 
+    filename = argv[1].split('/')[-1][0:-4]
+    time = strftime("%Y%m%d%H%M%S", gmtime())
+    os.mkdir(f"results/{filename}_{time}")
     warewolf_game = WareWolfGame(log_data)
     if not warewolf_game.load_prologue():
         print(colored("プロローグからプレイヤーを取得できませんでした。", "red"))
@@ -32,6 +37,6 @@ if __name__ == "__main__":
         last_day += 1
         print()
 
-    with open(f"./results/{argv[1].split('/')[-1]}", "w") as f:
+    with open(f"./results/{filename}_{time}/{filename}.csv", "w") as f:
         writer = csv.writer(f)
         writer.writerows(warewolf_game.generate_log_data)
