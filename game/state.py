@@ -9,7 +9,8 @@ from .nlp import NLP
 
 class WareWolfGame:
 
-    def __init__(self, log_data, config={}):
+    def __init__(self, filename, log_data, config={}):
+        self.filename = filename
         self.config = {
             "logging": True,
             "test_mode": False,
@@ -19,9 +20,11 @@ class WareWolfGame:
         if self.config["test_mode"]:
             from .test_template.template import TemplateResponder
             from .test_chatbot.chatbot import Chatbot
+            from .test_jsonld.jsonld import JsonldGenerator
         else:
             from template.template import TemplateResponder
             from chatbot.chatbot import Chatbot
+            from jsonld.jsonld import JsonldGenerator
         self.responder = {
             "template": TemplateResponder(),
             "chatbot": Chatbot()
@@ -37,6 +40,7 @@ class WareWolfGame:
         self.players_co_dict = {}
         self.nlp_results_list = []
         self.player_checked_list = []
+        self.jsonld_generator = JsonldGenerator
 
     def print_state(self):
         pprint(self.players_co_dict)
@@ -70,10 +74,12 @@ class WareWolfGame:
             self.loaded_log_count += 1
         self.players_count = len(self.players_co_dict)
         self._nlp.set_joined_players(self.joined_players_list)
+        name = self.joined_players_list[1][0]  # 最初に発言した人
+        self.jsonld_generator = self.jsonld_generator(self.filename, name, self.players_co_dict[name]["true_role_name"])
         return self.players_count > 0
 
     def vote(self):
-        if random.choice([0, 1]):   # COから選択
+        if random.choice([0, 1]) or self.last_day == 1:   # COから選択
             index_array = [
                 index
                 for index, user in enumerate(self.players_co_dict.values())
@@ -93,6 +99,8 @@ class WareWolfGame:
         if self.loaded_log_count == 0:
             print("プロローグが読み込まれていません。")
             return False
+        if self.last_day:
+            self.jsonld_generator.night_vote(self.last_day, self.vote())
         if self.end_flag:
             print("会話は終了しました")
             return False
@@ -116,12 +124,14 @@ class WareWolfGame:
                 self.generate_log_data[log_index - 1][3] = generated_sentence
                 self.print_log(colored(f"BLANK：\t空欄\t{log_index} {player_name} {true_role_name} {generated_sentence}", "blue"))
                 continue
+            if player_name == self.jsonld_generator.name:
+                self.jsonld_generator.chat(self.last_day, talks_text)
             # 【】で括られた文章の抜き取り
             if not (sentences := re.findall(r"【((?!>>\d|\d{2}:\d{2}).+?)】", talks_text)):
                 continue
             for sentence in sentences:
                 if self.config["test_mode"]:
-                    print(f"\n{log_index} {player_name} {sentence}")
+                    pass  # print(f"\n{log_index} {player_name} {sentence}")
                 results = self._nlp.parse({
                     "player_name": player_name,
                     "true_role_name": true_role_name,
@@ -138,6 +148,8 @@ class WareWolfGame:
                         color = "green" if r["is_true_sentence"] else "red"
                         colored_text = colored(f"{r['use_engine']}：\tCO\t{log_index} {r['target_name']} {comp_text} {r['role_name']}", color)
                         self.print_log(colored_text)
+                        if self.last_day == 1:
+                            self.jsonld_generator.noon_vote(1, self.vote())
                     elif r["mode"] == "co_check":
                         self.player_checked_list[-1]["co"][player_name] = log_index
                         colored_text = colored(f"{r['use_engine']}：\tCO確\t{log_index} {player_name}", "yellow")
@@ -158,9 +170,11 @@ class WareWolfGame:
                             "role_name": r["role_name"]
                         }
                         color = "green" if r["is_true_sentence"] else "red"
-                        mode = '占い師' if r['mode'] == 'seer' else '霊能者'
+                        mode = "占い師" if r["mode"] == 'seer' else "霊能者"
                         colored_text = colored(f"{r['use_engine']}：\t{mode}\t{log_index} {r['target_name']} {comp_text} {r['role_name']}", color)
                         self.print_log(colored_text)
+                        if mode == "占い師":
+                            self.jsonld_generator.noon_vote(self.last_day, self.vote())
         else:
             self.end_flag = True
         self.loaded_log_count += index
